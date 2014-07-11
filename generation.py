@@ -122,7 +122,7 @@ class Generation :
         for i in range(0, self.pop_size - self.num_random - self.num_elites) :
             children.append(self.__spawn_child(prob_fittest))
             
-        new_gen = Generation(self.pop_size,self.num_fittest,self.num_random,self.num_elites)
+        new_gen = Generation(self.Generator, self.simulation_func, self.pop_size,self.num_fittest,self.num_random,self.num_elites)
         new_gen.generators = children + self.__make_random_generators(self.num_random) + self.fittest[:self.num_elites]
         return new_gen
     

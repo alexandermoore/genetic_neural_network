@@ -4,29 +4,48 @@ Structure of chromosome weights is then:
 (i1 -> h1), (i1 -> h2), (i1 -> h3), (i2 -> h1), ..., (i3 -> h3),
 (h1 -> o1), (h2 -> o1), (h3 -> o1)
 """
+from generation import Generation
+from ann import GenFFANN
 
 def evolve_generations(simulation_func):
-	# Create start generation
-	# While not done
-	#	Simulate generation
-	#	Check if should be done
-	#	Spawn next generation
+    # Create start generation
+    # While not done
+    #	Simulate generation
+    #	Check if should be done
+    #	Spawn next generation
+    pop_size = 50
+    num_fittest = 5
+    num_random = 10
+    num_elites = 3
+    Generator = GenFFANN
+    current_gen = Generation(Generator, simulation_func, pop_size, num_fittest, num_random, num_elites)
 
-def apply_chromosome(ffann, chromosome):
-	ffann.chromosome = chromosome
-	inputs = range(ffann.inputrange[0], ffann.inputrange[1] + 1)
-	hiddens = range(ffann.hiddenrange[0], ffann.hiddenrange[1] + 1)
-	outputs = range(ffann.outputrange[0], ffann.outputrange[1] + 1)
+    MAX_BAD_GEN_COUNT = 0
+    best_fitness = 0
+    bad_gen_count = 0
+    negligible = 0.25
+    gen_num = 0
+    while True:
+        gen_num += 1
 
-	pos = 0
-	for n in inputs:
-		for h in hiddens:
-			ffann.set_edge_weight(n,h,chromosome[pos])
-			pos += 1
-	for h in hiddens:
-		for o in outputs:
-			ffann.set_edge_weight(h, o, chromosome[pos])
-			pos += 1
+        print "Running generation {0}".format(gen_num)
+
+        fitness = current_gen.run()
+
+        print "Fitness is {0} compared to {1}".format(fitness, best_fitness)
+        if fitness - best_fitness <= negligible:
+            bad_gen_count += 1
+            print "Bad Generation #{0}".format(bad_gen_count)
+        else:
+            bad_gen_count = 0
+            best_generator = current_gen.fittest[0]
+
+        if bad_gen_count >= MAX_BAD_GEN_COUNT:
+            return best_generator
+
+        current_gen = current_gen.spawn_next_generation()
+
+
 
 
 
