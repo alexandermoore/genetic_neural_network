@@ -1,5 +1,4 @@
 import random
-from generator import *
 
 class Generation :
     
@@ -14,8 +13,6 @@ class Generation :
     fittest = []
     # Generator objects in population
     generators = []
-    # # of parameters in Generator class
-    generator_param_count = 7
     # Number of random generators to add each time
     num_random = 0
     # Number of members from the fittest generators to keep in the population. Implements "elitism" so best genes are allowed to survive.
@@ -31,13 +28,14 @@ class Generation :
     -num_rnd (int) : Assigned to self.num_random
     -elites (int) : Assigned to self.num_elites
     '''    
-    def __init__(self,generator, simulation_func, pop_sz,num_fit,num_rnd,elites) :
+    def __init__(self,generator, simulation_func, pop_sz,num_fit,num_rnd,elites, generator_param_count) :
         self.pop_size = pop_sz
         self.num_fittest = num_fit
         self.num_random = num_rnd
         self.num_elites = elites
         self.Generator = generator
         self.simulation_func = simulation_func
+        self.generator_param_count = generator_param_count
     
     ''' simulate_generators
     In situations where all generators compete, this allows an external function to
@@ -71,7 +69,7 @@ class Generation :
     def __make_random_generators(self,count) :
         rand_gens = []
         for i in range(0, count) :
-            new_gen = self.Generator([random.random() for x in range (0,self.generator_param_count)])
+            new_gen = self.Generator([-1 + 2*random.random() for x in range (0,self.generator_param_count)])
             rand_gens.append(new_gen)
         return rand_gens
 
@@ -122,7 +120,7 @@ class Generation :
         for i in range(0, self.pop_size - self.num_random - self.num_elites) :
             children.append(self.__spawn_child(prob_fittest))
             
-        new_gen = Generation(self.Generator, self.simulation_func, self.pop_size,self.num_fittest,self.num_random,self.num_elites)
+        new_gen = Generation(self.Generator, self.simulation_func, self.pop_size,self.num_fittest,self.num_random,self.num_elites, self.generator_param_count)
         new_gen.generators = children + self.__make_random_generators(self.num_random) + self.fittest[:self.num_elites]
         return new_gen
     
@@ -177,12 +175,16 @@ class Generation :
         # More fit = more likely to pass on genes.
         g1r = float(g1.fitness)
         g2r = float(g2.fitness)
-        weight = g1r / (g1r + g2r)
+        if (g1r + g2r == 0):
+            # If sum is 0, just choose arbitrarily
+            weight = 0.5
+        else:
+            weight = g1r / (g1r + g2r)
 
         # THIS IS A WEIGHTED AVERAGE CROSSOVER. Child is the weighted average of its parents.
         '''
-        params1 = g1.parameter_list
-        params2 = g2.parameter_list
+        params1 = g1.chromosome
+        params2 = g2.chromosome
         newparams = []
         for i in range(0,self.generator_param_count) :
             gene = weight * params1[i] + (1.0 - weight) * params2[i]
@@ -190,8 +192,8 @@ class Generation :
         '''
         
         # Cross over parameters randomly
-        params1 = g1.parameter_list
-        params2 = g2.parameter_list
+        params1 = g1.chromosome
+        params2 = g2.chromosome
         newparams = []
         for i in range(0,self.generator_param_count) :
             if (random.random() < weight) :

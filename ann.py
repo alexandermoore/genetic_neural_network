@@ -21,11 +21,13 @@ class GenFFANN():
     OUTPUTSIZE = 1
     def __init__(self, chromosome):
         self.ffann = FFANN()
+        self.chromosome = []
         self.ffann.create_feedforward_network(GenFFANN.INPUTSIZE, GenFFANN.HIDDENSIZE, GenFFANN.OUTPUTSIZE)
         self.apply_chromosome(self.ffann, chromosome)
         self.fitness = 0
 
     def apply_chromosome(self, ffann, chromosome):
+        self.chromosome = chromosome
         inputs = range(ffann.inputrange[0], ffann.inputrange[1] + 1)
         hiddens = range(ffann.hiddenrange[0], ffann.hiddenrange[1] + 1)
         outputs = range(ffann.outputrange[0], ffann.outputrange[1] + 1)
@@ -126,7 +128,7 @@ class FFANN():
         # Evaluate output layer
         for o in outputs:
             total = 0
-            for n in self.neurons[o]["incoming_edges"]:
+            for n in self.neurons[o]["incoming_edges"].keys():
                 total += self.neurons[n]["value"] * self.neurons[n]["edges"][o]
             self.neurons[o]["value"] = self.act_func(total)
 
