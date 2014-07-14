@@ -8,16 +8,12 @@ from generation import Generation
 from ann import GenFFANN
 
 
-def evolve_generations_count(simulation_func, max_num_generations):
+def evolve_generations_count(simulation_func, max_num_generations, pop_size=60, num_fittest=5, num_random=10, num_elites=3):
     # Create start generation
     # While not done
     #	Simulate generation
     #	Check if should be done
     #	Spawn next generation
-    pop_size = 60
-    num_fittest = 5
-    num_random = 10
-    num_elites = 3
     Generator = GenFFANN
     num_params = (GenFFANN.INPUTSIZE * GenFFANN.HIDDENSIZE) + (GenFFANN.HIDDENSIZE * GenFFANN.OUTPUTSIZE)
     print num_params
@@ -43,16 +39,12 @@ def evolve_generations_count(simulation_func, max_num_generations):
 
         current_gen = current_gen.spawn_next_generation()
 
-def evolve_generations_plateau(simulation_func, negligible, max_bad_gen_count):
+def evolve_generations_plateau(simulation_func, negligible, max_bad_gen_count, pop_size=60, num_fittest=5, num_random=10, num_elites=3):
     # Create start generation
     # While not done
     #	Simulate generation
     #	Check if should be done
     #	Spawn next generation
-    pop_size = 60
-    num_fittest = 5
-    num_random = 10
-    num_elites = 3
     Generator = GenFFANN
     num_params = (GenFFANN.INPUTSIZE * GenFFANN.HIDDENSIZE) + (GenFFANN.HIDDENSIZE * GenFFANN.OUTPUTSIZE)
     print num_params
